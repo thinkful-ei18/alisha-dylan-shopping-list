@@ -11,15 +11,14 @@
 // something to see when the page first loads.
 
 const STORE = {
-  items :[
-    { name: 'apples', checked: false, searchResult: true },
-    { name: 'oranges', checked: false, searchResult: true },
-    { name: 'milk', checked: true, searchResult: true },
-    { name: 'bread', checked: false, searchResult: true }
+  items: [
+    { name: 'apples', checked: false, isEditing: false},
+    { name: 'oranges', checked: false, isEditing: false},
+    { name: 'milk', checked: true, isEditing: false},
+    { name: 'bread', checked: false, isEditing: false}
   ],
   showChecked: false,
-  searching: '',
-  
+  search: ''
 };
 
 /**
@@ -32,22 +31,25 @@ function renderShoppingList() {
 
 /**
  * map over the STORE array
- * @param {array} arr 
+ * @param {array} arr
  */
 function arrayMap(arr) {
   return arr.map((item, index) => itemToHTML(item, index));
 }
 
-
 /**
  * pull values from STORE
- * @param {object} item 
- * @param {number} index 
+ * @param {object} item
+ * @param {number} index
  */
 function itemToHTML(item, index) {
-  return `
-    <li class="js-item-index-element ${(STORE.showChecked && item.checked) || item.searchResult === false ? 'hidden' : ''}" data-item-index="${index}">
-      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+  const isVisible = (STORE.showChecked && item.checked) || search(item) === false
+        ? 'hidden'
+        : '';
+  // make check button toggle text content
+  const isChecked = item.checked ? 'shopping-item__checked' : '';
+  let itemHtml = `
+      <span class="shopping-item js-shopping-item ${isChecked}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -55,12 +57,15 @@ function itemToHTML(item, index) {
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
         </button>
-      </div>
-    </li>
+      </div>   
   `;
+  if (item.isEditing) {
+    itemHtml = '';
+  }
+  return `<li class="js-item-index-element ${isVisible}" data-item-index="${index}">
+      ${itemHtml}
+    </li>`;
 }
-
-
 
 function handleNewItemSubmit() {
   $('#js-shopping-list-form').on('submit', event => {
@@ -70,7 +75,6 @@ function handleNewItemSubmit() {
     STORE.items.push(createNewStoreEntry(input));
     renderShoppingList();
   });
-  console.log('`handleNewItemSubmit` ran');
 }
 
 function createNewStoreEntry(input) {
@@ -82,13 +86,11 @@ function createNewStoreEntry(input) {
 }
 
 function getId(event) {
-  return event
-    .closest('li')
-    .attr('data-item-index');
+  return event.closest('li').attr('data-item-index');
 }
 /**
  * listen for when 'check' is clicked on the DOM
- * adjust 'checked' property 
+ * adjust 'checked' property
  * re-render page
  */
 function handleItemCheckClicked() {
@@ -98,7 +100,6 @@ function handleItemCheckClicked() {
     renderShoppingList();
   });
 }
-
 
 function handleDeleteItemClicked() {
   $('.js-shopping-list').on('click', '.js-item-delete', event => {
@@ -116,19 +117,23 @@ function handleShowChecked() {
   });
 }
 
+
 /**
  * User can type in a search term and get a filtered item list by title
  */
 function handleSearch() {
-  $('.js-shopping-list-search').on('keyup', event => {
-    STORE.searching = $('.js-shopping-list-search').val();
-    STORE.items.forEach(function (item) {
-      item.name.substr(0, STORE.searching.length) !== STORE.searching ? item.searchResult = false : item.searchResult = true ;
-    });
+  $('.js-search-button').on('click', event => {
+    event.preventDefault();
+    STORE.search = $('.js-shopping-list-search').val();    
     renderShoppingList();
   });
 }
 
+function search(item) {
+  STORE.items.forEach(function(item) {
+    return item.name.substr(0, STORE.search.length) === STORE.search;
+  });
+}
 
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
