@@ -9,6 +9,7 @@
 // indicates if it's checked off or not.
 // we're pre-adding items to the shopping list so there's
 // something to see when the page first loads.
+
 const STORE = [
   { name: 'apples', checked: false },
   { name: 'oranges', checked: false },
@@ -16,11 +17,44 @@ const STORE = [
   { name: 'bread', checked: false }
 ];
 
+/**
+ * push the list to the DOM
+ */
 function renderShoppingList() {
-  // this function will be repsonsible for rendering the shopping list in
-  // the DOM
-  console.log('`renderShoppingList` ran');
+  let renderedItems = arrayMap(STORE);
+  $('.js-shopping-list').html(renderedItems);
 }
+
+/**
+ * map over the STORE array
+ * @param {array} arr 
+ */
+function arrayMap(arr) {
+  return arr.map((item, index) => itemToHTML(item, index));
+}
+
+/**
+ * pull values from STORE
+ * @param {object} item 
+ * @param {number} index 
+ */
+function itemToHTML(item, index) {
+  return `
+    <li class="js-item-index-element" data-item-index="${index}">
+      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+      <div class="shopping-item-controls">
+        <button class="shopping-item-toggle js-item-toggle">
+            <span class="button-label">check</span>
+        </button>
+        <button class="shopping-item-delete js-item-delete">
+            <span class="button-label">delete</span>
+        </button>
+      </div>
+    </li>
+  `;
+}
+
+
 
 function handleNewItemSubmit() {
   // this function will be responsible for when users add a new shopping list item
