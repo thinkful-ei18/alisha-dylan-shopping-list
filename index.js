@@ -14,7 +14,7 @@ const STORE = [
   { name: 'apples', checked: false },
   { name: 'oranges', checked: false },
   { name: 'milk', checked: true },
-  { name: 'bread', checked: false },
+  { name: 'bread', checked: false }
 ];
 
 /**
@@ -74,7 +74,11 @@ function createNewStoreEntry(input) {
   };
 }
 
-
+function getId(event) {
+  return event
+    .closest('li')
+    .attr('data-item-index');
+}
 /**
  * listen for when 'check' is clicked on the DOM
  * adjust 'checked' property 
@@ -82,7 +86,7 @@ function createNewStoreEntry(input) {
  */
 function handleItemCheckClicked() {
   $('.js-shopping-list').on('click', '.js-item-toggle', event => {
-    let itemID = $(event.currentTarget).closest('li').attr('data-item-index');
+    let itemID = getId($(event.currentTarget));
     STORE[itemID].checked = !STORE[itemID].checked;
     renderShoppingList();
   });
@@ -90,9 +94,11 @@ function handleItemCheckClicked() {
 
 
 function handleDeleteItemClicked() {
-  // this function will be responsible for when users want to delete a shopping list
-  // item
-  console.log('`handleDeleteItemClicked` ran');
+  $('.js-shopping-list').on('click', '.js-item-delete', event => {
+    let itemID = getId($(event.currentTarget));
+    STORE.splice(itemID, 1);
+    renderShoppingList();
+  });
 }
 
 // this function will be our callback when the page loads. it's responsible for
