@@ -10,18 +10,21 @@
 // we're pre-adding items to the shopping list so there's
 // something to see when the page first loads.
 
-const STORE = [
-  { name: 'apples', checked: false },
-  { name: 'oranges', checked: false },
-  { name: 'milk', checked: true },
-  { name: 'bread', checked: false }
-];
+const STORE = {
+  items :[
+    { name: 'apples', checked: false },
+    { name: 'oranges', checked: false },
+    { name: 'milk', checked: true },
+    { name: 'bread', checked: false }
+  ],
+  showChecked: false
+};
 
 /**
  * push the list to the DOM
  */
 function renderShoppingList() {
-  let renderedItems = arrayMap(STORE);
+  let renderedItems = arrayMap(STORE.items);
   $('.js-shopping-list').html(renderedItems);
 }
 
@@ -33,6 +36,7 @@ function arrayMap(arr) {
   return arr.map((item, index) => itemToHTML(item, index));
 }
 
+
 /**
  * pull values from STORE
  * @param {object} item 
@@ -40,7 +44,7 @@ function arrayMap(arr) {
  */
 function itemToHTML(item, index) {
   return `
-    <li class="js-item-index-element" data-item-index="${index}">
+    <li class="js-item-index-element ${STORE.showChecked && item.checked ? 'hidden' : ''}" data-item-index="${index}">
       <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
@@ -61,7 +65,7 @@ function handleNewItemSubmit() {
     event.preventDefault();
     const input = $('.js-shopping-list-entry').val();
     $('.js-shopping-list-entry').val('');
-    STORE.push(createNewStoreEntry(input));
+    STORE.items.push(createNewStoreEntry(input));
     renderShoppingList();
   });
   console.log('`handleNewItemSubmit` ran');
@@ -87,7 +91,7 @@ function getId(event) {
 function handleItemCheckClicked() {
   $('.js-shopping-list').on('click', '.js-item-toggle', event => {
     let itemID = getId($(event.currentTarget));
-    STORE[itemID].checked = !STORE[itemID].checked;
+    STORE.items[itemID].checked = !STORE.items[itemID].checked;
     renderShoppingList();
   });
 }
@@ -96,7 +100,15 @@ function handleItemCheckClicked() {
 function handleDeleteItemClicked() {
   $('.js-shopping-list').on('click', '.js-item-delete', event => {
     let itemID = getId($(event.currentTarget));
-    STORE.splice(itemID, 1);
+    STORE.items.splice(itemID, 1);
+    renderShoppingList();
+  });
+}
+
+// press a toggle to show all items or unchecked items
+function handleShowChecked() {
+  $('#js-showChecked').on('click', event => {
+    STORE.showChecked = !STORE.showChecked;
     renderShoppingList();
   });
 }
@@ -110,6 +122,7 @@ function handleShoppingList() {
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
+  handleShowChecked();
 }
 
 // when the page loads, call `handleShoppingList`
