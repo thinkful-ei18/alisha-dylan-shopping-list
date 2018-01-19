@@ -14,7 +14,7 @@ const STORE = [
   { name: 'apples', checked: false },
   { name: 'oranges', checked: false },
   { name: 'milk', checked: true },
-  { name: 'bread', checked: false }
+  { name: 'bread', checked: false },
 ];
 
 /**
@@ -57,8 +57,21 @@ function itemToHTML(item, index) {
 
 
 function handleNewItemSubmit() {
-  // this function will be responsible for when users add a new shopping list item
+  $('#js-shopping-list-form').on('submit', event => {
+    event.preventDefault();
+    const input = $('.js-shopping-list-entry').val();
+    $('.js-shopping-list-entry').val('');
+    STORE.push(createNewStoreEntry(input));
+    renderShoppingList();
+  });
   console.log('`handleNewItemSubmit` ran');
+}
+
+function createNewStoreEntry(input) {
+  return {
+    name: input,
+    checked: false
+  };
 }
 
 function handleItemCheckClicked() {
