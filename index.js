@@ -145,9 +145,7 @@ function handleSearch() {
 }
 
 function search(item) {
-  // console.log(item);
   if (STORE.search !== ''){
-    console.log(item.name.substr(0, STORE.search.length) === STORE.search);
     return item.name.substr(0, STORE.search.length) === STORE.search;
   }
   return true;
