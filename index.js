@@ -44,8 +44,8 @@ function arrayMap(arr) {
  */
 function itemToHTML(item, index) {
   const isVisible = (STORE.showChecked && item.checked) || search(item) === false
-        ? 'hidden'
-        : '';
+    ? 'hidden'
+    : '';
   // make check button toggle text content
   const isChecked = item.checked ? 'shopping-item__checked' : '';
   let itemHtml = `
@@ -57,10 +57,25 @@ function itemToHTML(item, index) {
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
         </button>
+        <button class="shopping-item-edit js-item-edit">
+            <span class="button-label">edit</span>
+        </button>
       </div>   
   `;
   if (item.isEditing) {
-    itemHtml = '';
+    itemHtml = `
+    <form id='js-editing-form'>
+      <input type='text' value ='${item.name}' id='js-edit-value'>
+        <div class="shopping-item-controls">
+          <button class="shopping-item-confirm js-item-confirm">
+              <span class="button-label">confirm</span>
+          </button>
+          <button class="shopping-item-cancel js-item-cancel">
+              <span class="button-label">cancel</span>
+          </button>
+        </div> 
+      </form>
+      `;
   }
   return `<li class="js-item-index-element ${isVisible}" data-item-index="${index}">
       ${itemHtml}
@@ -81,7 +96,7 @@ function createNewStoreEntry(input) {
   return {
     name: input,
     checked: false,
-    searchResult: true
+    isEditing: false
   };
 }
 
@@ -122,16 +137,53 @@ function handleShowChecked() {
  * User can type in a search term and get a filtered item list by title
  */
 function handleSearch() {
-  $('.js-search-button').on('click', event => {
+  $('#js-search-form').on('submit', event => {
     event.preventDefault();
-    STORE.search = $('.js-shopping-list-search').val();    
+    STORE.search = $('.js-shopping-list-search').val();   
     renderShoppingList();
   });
 }
 
 function search(item) {
-  STORE.items.forEach(function(item) {
+  // console.log(item);
+  if (STORE.search !== ''){
+    console.log(item.name.substr(0, STORE.search.length) === STORE.search);
     return item.name.substr(0, STORE.search.length) === STORE.search;
+  }
+  return true;
+}
+
+function handleEdit(){
+  $('.js-shopping-list').on('click', '.js-shopping-item', event => {
+    edit(event);
+  });
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    edit(event);
+  });
+}
+
+function edit(event){
+  let itemID = getId($(event.currentTarget));
+  STORE.items[itemID].isEditing = true;
+  renderShoppingList();
+}
+
+function handleEditConfirm(){
+  $('.js-shopping-list').on('click', '.js-item-confirm', event => {
+    event.preventDefault();
+    let itemID = getId($(event.currentTarget));
+    STORE.items[itemID].name = $('#js-edit-value').val();
+    STORE.items[itemID].isEditing = false;
+    renderShoppingList();
+  });
+}
+
+function handleEditCancel(){
+  $('.js-shopping-list').on('click', '.js-item-cancel', event => {
+    event.preventDefault();
+    let itemID = getId($(event.currentTarget));
+    STORE.items[itemID].isEditing = false;
+    renderShoppingList();
   });
 }
 
@@ -146,6 +198,9 @@ function handleShoppingList() {
   handleDeleteItemClicked();
   handleShowChecked();
   handleSearch();
+  handleEdit();
+  handleEditConfirm();
+  handleEditCancel();
 }
 
 // when the page loads, call `handleShoppingList`
