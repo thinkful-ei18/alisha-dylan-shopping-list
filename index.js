@@ -44,8 +44,8 @@ function arrayMap(arr) {
  */
 function itemToHTML(item, index) {
   const isVisible = (STORE.showChecked && item.checked) || search(item) === false
-        ? 'hidden'
-        : '';
+    ? 'hidden'
+    : '';
   // make check button toggle text content
   const isChecked = item.checked ? 'shopping-item__checked' : '';
   let itemHtml = `
@@ -124,15 +124,31 @@ function handleShowChecked() {
 function handleSearch() {
   $('.js-search-button').on('click', event => {
     event.preventDefault();
-    STORE.search = $('.js-shopping-list-search').val();    
+    let searchedItem = $('.js-shopping-list-search').val();
+    STORE.items.forEach( function(item) {
+      if (item.name === searchedItem) {
+
+      }
+    }
+    // for (let i = 0; i < STORE.items.length; i++) {
+    //   if (searchedItem === STORE.items[i].name.substr(0, STORE.search.length)) {
+    //     return 
+    //   }
+    // }
+       
     renderShoppingList();
   });
 }
 
 function search(item) {
-  STORE.items.forEach(function(item) {
-    return item.name.substr(0, STORE.search.length) === STORE.search;
-  });
+  let searchedItem = $('.js-shopping-list-search').val();
+  console.log(searchedItem);
+  // STORE.items.forEach(function(item) {
+  //   if () {
+
+  //   }
+  //   return item.name.substr(0, STORE.search.length) === STORE.search;
+  // });
 }
 
 // this function will be our callback when the page loads. it's responsible for
